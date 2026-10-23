@@ -27,22 +27,40 @@ Status: MVP in progress. Apache-2.0. Not affiliated with Vectara or Proofpoint, 
 - Billing: Lago + Stripe
 - Deploy: Docker, Kubernetes, Helm, Terraform
 
-## Repository structure (target)
+## Repository structure
+
+Folders marked `(target)` do not exist yet.
 
 ```
-api/         FastAPI: /v1 routes, auth, quotas
-workers/     Celery: ingestion, parsing, OCR, embeddings
-retrieval/   Hybrid search, reranking, tenant filters
-generation/  LLM gateway, prompts, citations, hallucination score
-connectors/  Web crawler, Google Drive, SharePoint
-console/     Next.js admin console and playground
-widget/      Chat and search Web Component
-eval/        Evaluation suite (recall@10, hallucination rate)
-deploy/      docker-compose, Helm charts, Terraform
-docs/        Specs, architecture decisions, guides
+pyproject.toml  Single Python project (uv): dependencies, ruff, mypy, pytest, coverage, import-linter
+uv.lock         Locked dependency versions (always committed)
+.github/        CI workflow (lint, format, type check, import contracts, tests)
+api/         FastAPI: /v1 routes, auth, quotas (package only)
+workers/     Celery: ingestion, parsing, OCR, embeddings (package only)
+retrieval/   Hybrid search, reranking, tenant filters (package only)
+generation/  LLM gateway, prompts, citations, hallucination score (package only)
+connectors/  Web crawler, Google Drive, SharePoint (package only)
+eval/        Evaluation suite (recall@10, hallucination rate) (package only)
+tests/       Test suite (pytest)
+console/     Next.js admin console and playground (target)
+widget/      Chat and search Web Component (target)
+deploy/      docker-compose, Helm charts, Terraform (target)
+docs/        Specs, architecture decisions, guides (target)
 ```
 
 ## Commands
+
+Setup (Python 3.11+, [uv](https://docs.astral.sh/uv/)): `uv sync`
+
+Run all of these before declaring a task done (CI runs the same commands):
+
+- Lint: `uv run ruff check .`
+- Format check: `uv run ruff format --check .` (apply with `uv run ruff format .`)
+- Type check (strict): `uv run mypy .`
+- Import contracts (layer separation): `uv run lint-imports`
+- Tests with coverage (fails under 70%): `uv run pytest --cov`
+
+Dependencies: add with `uv add <package>` (or `uv add --dev <package>`) and commit `uv.lock`. CI installs with `uv sync --frozen`.
 
 Local stack (target): `cp .env.example .env && docker compose -f deploy/docker-compose.yml up -d`
 
@@ -50,7 +68,7 @@ Local stack (target): `cp .env.example .env && docker compose -f deploy/docker-c
 - Console: http://localhost:3000
 - Grafana: http://localhost:3001
 
-Tests, lint, type check and eval commands: TODO. Once defined, list them here (exact commands) and always run them before declaring a task done.
+Eval command: TODO (the eval suite does not exist yet).
 
 ## Architecture rules
 
