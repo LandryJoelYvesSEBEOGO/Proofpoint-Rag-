@@ -124,6 +124,7 @@ Recall@10 >= 85%, hallucination rate < 5%, search p95 < 300 ms, time to first to
 - Use plan mode for any task touching more than one module; keep one task per session.
 - Branches: `feat/...` or `fix/...` from `main`. Add tests; tests, lint and the eval suite must pass before opening a PR.
 - Prefer small, reviewable diffs. Commit messages: imperative, one line, with the scope (for example `retrieval: add tenant filter to sparse search`).
+- Authorship is the repository owner only. Do not mention Claude, Claude Code, Anthropic or any AI assistant in commit messages, PR titles or PR descriptions: no `Co-Authored-By` trailer, no "Generated with" line.
 - Specs and architecture decisions go in `docs/`, not in code comments.
 - Everything in the repository and on GitHub is in English: code, comments, docstrings, docs, branch names, commit messages, PRs. Multilingual test data (French, Arabic) is the only exception.
 - Raw source documents live in `data/raw/` (gitignored) and are never committed.
