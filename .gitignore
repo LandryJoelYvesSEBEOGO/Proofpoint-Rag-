@@ -7,8 +7,10 @@ Vectara — Analyse & cahier des charges.docx
 .env.*
 !.env.example
 
-# Raw documents (never committed: customer or third-party data)
-data/raw/
+# Private data: raw documents and anything derived from them (manifests,
+# eval questions). Public synthetic fixtures belong in tests/fixtures/.
+/Raw/
+/data/
 
 # Local tooling
 .qodo/
