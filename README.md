@@ -109,11 +109,11 @@ A single context layer (2) serves every use case: adding a new assistant or agen
 Requirements: Docker and Docker Compose, 16 GB of RAM, a GPU recommended for embeddings.
 
 ```bash
-git clone https://github.com/<your-account>/proofpoint_Rag.git
+git clone https://github.com/LandryJoelYvesSEBEOGO/Proofpoint-Rag-.git
 ```
 
 ```bash
-cd proofpoint_Rag && cp .env.example .env
+cd Proofpoint-Rag- && cp .env.example .env
 ```
 
 ```bash
@@ -160,7 +160,7 @@ Response (excerpt):
 ## Repository structure
 
 ```
-proofpoint_Rag/
+Proofpoint-Rag-/
 ├── api/           # FastAPI: /v1 routes, authentication, quotas
 ├── workers/       # Celery: ingestion, parsing, OCR, embeddings
 ├── retrieval/     # Hybrid search, reranking, tenant filters
