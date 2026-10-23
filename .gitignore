@@ -1,0 +1,34 @@
+# Private planning documents
+Roadmap MVP — Plateforme RAG.docx
+Vectara — Analyse & cahier des charges.docx
+
+# Secrets and local config
+.env
+.env.*
+!.env.example
+
+# Raw documents (never committed: customer or third-party data)
+data/raw/
+
+# Local tooling
+.qodo/
+.vscode/
+.idea/
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+dist/
+build/
+
+# Node
+node_modules/
+.next/
