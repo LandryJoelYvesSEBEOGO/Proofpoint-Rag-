@@ -127,7 +127,7 @@ Recall@10 >= 85%, hallucination rate < 5%, search p95 < 300 ms, time to first to
 - Authorship is the repository owner only. Do not mention Claude, Claude Code, Anthropic or any AI assistant in commit messages, PR titles or PR descriptions: no `Co-Authored-By` trailer, no "Generated with" line.
 - Specs and architecture decisions go in `docs/`, not in code comments.
 - Everything in the repository and on GitHub is in English: code, comments, docstrings, docs, branch names, commit messages, PRs. Multilingual test data (French, Arabic) is the only exception.
-- Raw source documents live in `data/raw/` (gitignored) and are never committed.
+- Raw source documents live in `Raw/` and derived private artifacts (manifests, eval questions) in `data/`; both are gitignored and never committed. CI uses public synthetic fixtures only.
 
 ## Do not
 
