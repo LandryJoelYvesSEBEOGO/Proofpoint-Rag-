@@ -36,7 +36,9 @@ pyproject.toml  Single Python project (uv): dependencies, ruff, mypy, pytest, co
 uv.lock         Locked dependency versions (always committed)
 .github/        CI workflow (lint, format, type check, import contracts, tests, local stack health)
 .env.example    Every environment variable, documented, with development-only values
-api/         FastAPI: /v1 routes, auth, quotas (package only)
+api/         FastAPI app: app.py (factory), main.py (uvicorn entry point), settings.py (env config),
+             errors.py (typed errors), tracing.py (OpenTelemetry, trace id), middleware.py
+             (x-trace-id header, request log), log_config.py (JSON logs), health.py, v1/ (/v1 routes)
 workers/     Celery: ingestion, parsing, OCR, embeddings (package only)
 retrieval/   Hybrid search, reranking, tenant filters (package only)
 generation/  LLM gateway, prompts, citations, hallucination score (package only)
@@ -72,9 +74,13 @@ Local stack (Docker Compose v2, run from the repository root; `--env-file` is re
 - Stop and delete all local data: `docker compose --env-file .env -f deploy/docker-compose.yml down --volumes`
 - Services, all bound to 127.0.0.1: PostgreSQL :5432, Valkey :6379, S3 endpoint :8333, Qdrant :6333
 
-Target endpoints (not implemented yet):
+API (run from the repository root):
 
-- API docs: http://localhost:8000/docs
+- Start with auto-reload: `uv run --env-file .env uvicorn api.main:app --reload --no-access-log` (`--no-access-log`: the app writes its own JSON request log, without query strings)
+- Health: http://localhost:8000/health; API docs: http://localhost:8000/docs
+- Every response carries an `x-trace-id` header; error bodies have the shape `{"error": {"code", "message", "details"}, "trace_id"}` (see `api/errors.py`). Raise `api.errors.ApiError` for deliberate client errors.
+
+Target endpoints (not implemented yet):
 - Console: http://localhost:3000
 - Grafana: http://localhost:3001
 
