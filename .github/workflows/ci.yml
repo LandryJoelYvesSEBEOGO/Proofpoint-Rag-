@@ -43,3 +43,25 @@ jobs:
 
       - name: Run tests with coverage
         run: uv run pytest --cov
+
+  local-stack:
+    name: Local stack starts healthy
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Validate the compose file
+        run: docker compose --env-file .env.example -f deploy/docker-compose.yml config --quiet
+
+      - name: Start every service and wait for its healthcheck
+        run: docker compose --env-file .env.example -f deploy/docker-compose.yml up --detach --wait --wait-timeout 300
+
+      - name: Show service logs on failure
+        if: failure()
+        run: docker compose --env-file .env.example -f deploy/docker-compose.yml logs
+
+      - name: Stop the stack
+        if: always()
+        run: docker compose --env-file .env.example -f deploy/docker-compose.yml down --volumes

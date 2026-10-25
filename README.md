@@ -88,7 +88,7 @@ A single context layer (2) serves every use case: adding a new assistant or agen
 | Component | Choice |
 | --- | --- |
 | API | Python, FastAPI |
-| Background jobs | Celery + Redis |
+| Background jobs | Celery + Valkey (Redis-compatible) |
 | Parsing / OCR | Docling, Unstructured, Tesseract |
 | Embeddings | BGE-M3 served by Text Embeddings Inference |
 | Hybrid index | Qdrant (dense + sparse) |
@@ -97,7 +97,7 @@ A single context layer (2) serves every use case: adding a new assistant or agen
 | Hallucination detection | HHEM-2.1-Open |
 | Console and widget | Next.js, React, Web Component |
 | Authentication | Keycloak |
-| Data | PostgreSQL, MinIO / S3 |
+| Data | PostgreSQL, S3-compatible object storage (SeaweedFS or managed S3) |
 | Observability | OpenTelemetry, Prometheus, Grafana, Langfuse |
 | Billing | Lago + Stripe |
 | Deployment | Docker, Kubernetes, Helm, Terraform |
@@ -117,7 +117,7 @@ cd Proofpoint-Rag- && cp .env.example .env
 ```
 
 ```bash
-docker compose -f deploy/docker-compose.yml up -d
+docker compose --env-file .env -f deploy/docker-compose.yml up -d --wait
 ```
 
 Local services:
