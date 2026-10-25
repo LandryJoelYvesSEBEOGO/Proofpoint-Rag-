@@ -14,7 +14,7 @@ Status: MVP in progress. Apache-2.0. Not affiliated with Vectara or Proofpoint, 
 ## Tech stack
 
 - API: Python 3.11+, FastAPI
-- Jobs: Celery + Redis
+- Jobs: Celery + Valkey (BSD-licensed, Redis-protocol compatible; Redis >= 7.4 is not open source)
 - Parsing/OCR: Docling, Unstructured, Tesseract
 - Embeddings: BGE-M3 via Text Embeddings Inference
 - Index: Qdrant (dense + sparse), hybrid with BM25
@@ -22,7 +22,7 @@ Status: MVP in progress. Apache-2.0. Not affiliated with Vectara or Proofpoint, 
 - LLM: LiteLLM gateway; vLLM for open models; BYO keys (Claude, GPT, Mistral)
 - Hallucination detection: HHEM-2.1-Open
 - Console/widget: Next.js, React, Web Component
-- Auth: Keycloak. Data: PostgreSQL, MinIO/S3
+- Auth: Keycloak. Data: PostgreSQL; object storage through the S3 API only (SeaweedFS in development and on-prem, managed S3 in SaaS; MinIO no longer ships public images)
 - Observability: OpenTelemetry, Prometheus, Grafana, Langfuse
 - Billing: Lago + Stripe
 - Deploy: Docker, Kubernetes, Helm, Terraform
@@ -34,7 +34,8 @@ Folders marked `(target)` do not exist yet.
 ```
 pyproject.toml  Single Python project (uv): dependencies, ruff, mypy, pytest, coverage, import-linter
 uv.lock         Locked dependency versions (always committed)
-.github/        CI workflow (lint, format, type check, import contracts, tests)
+.github/        CI workflow (lint, format, type check, import contracts, tests, local stack health)
+.env.example    Every environment variable, documented, with development-only values
 api/         FastAPI: /v1 routes, auth, quotas (package only)
 workers/     Celery: ingestion, parsing, OCR, embeddings (package only)
 retrieval/   Hybrid search, reranking, tenant filters (package only)
@@ -44,7 +45,7 @@ eval/        Evaluation suite (recall@10, hallucination rate) (package only)
 tests/       Test suite (pytest)
 console/     Next.js admin console and playground (target)
 widget/      Chat and search Web Component (target)
-deploy/      docker-compose, Helm charts, Terraform (target)
+deploy/      docker-compose.yml: local stack (PostgreSQL, Valkey, SeaweedFS S3, Qdrant); Helm, Terraform (target)
 docs/        Specs, architecture decisions, guides (target)
 ```
 
@@ -62,7 +63,16 @@ Run all of these before declaring a task done (CI runs the same commands):
 
 Dependencies: add with `uv add <package>` (or `uv add --dev <package>`) and commit `uv.lock`. CI installs with `uv sync --frozen`.
 
-Local stack (target): `cp .env.example .env && docker compose -f deploy/docker-compose.yml up -d`
+Local stack (Docker Compose v2, run from the repository root; `--env-file` is required because the compose file lives in `deploy/`):
+
+- First time: `cp .env.example .env`
+- Start and wait until every service is healthy: `docker compose --env-file .env -f deploy/docker-compose.yml up -d --wait`
+- Status: `docker compose --env-file .env -f deploy/docker-compose.yml ps`
+- Stop (keep data): `docker compose --env-file .env -f deploy/docker-compose.yml down`
+- Stop and delete all local data: `docker compose --env-file .env -f deploy/docker-compose.yml down --volumes`
+- Services, all bound to 127.0.0.1: PostgreSQL :5432, Valkey :6379, S3 endpoint :8333, Qdrant :6333
+
+Target endpoints (not implemented yet):
 
 - API docs: http://localhost:8000/docs
 - Console: http://localhost:3000
