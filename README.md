@@ -175,13 +175,9 @@ Proofpoint-Rag-/
 
 ## Roadmap
 
-The MVP is built over 26 weeks in 5 phases, each closed by a validation milestone.
+The MVP roadmap spans 26 relative weeks across five phases, each with a concrete exit gate. For the detailed sprint tasks, requirement IDs, evidence, and current open decisions, see [docs/ROADMAP.md](./docs/ROADMAP.md).
 
-- [ ] **Phase 0 — Discovery (W1–W2)**: prospect interviews, 200-question evaluation set, stack decisions
-- [ ] **Phase 1 — Technical foundation (W3–W10)**: infrastructure, accounts, ingestion, multi-tenant hybrid index, search API
-- [ ] **Phase 2 — Generation and trust (W11–W18)**: streamed cited answers, chat, hallucination score, console, tracing
-- [ ] **Phase 3 — Go-to-market (W19–W22)**: connectors, widget, free trial, billing, public documentation
-- [ ] **Phase 4 — Pilots and launch (W23–W26)**: 3 pilot customers, penetration test, load testing, launch
+**Current position (2026-10-29): Phase 1, Sprint 1 — Infrastructure and accounts, in progress.** The Phase 0 J0 market gate was explicitly waived so work could proceed; its three pilot letters of intent and other discovery deliverables have not thereby been completed. The local stack and FastAPI skeleton are foundations, not completion of Sprint 1 or J1.
 
 ## Quality targets
 
