@@ -1,0 +1,37 @@
+{
+  "realm": "proofpoint-local",
+  "displayName": "ProofPoint RAG Local Development",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "roles": {
+    "realm": [
+      {
+        "name": "Admin",
+        "description": "May administer the local development tenant."
+      },
+      {
+        "name": "Developer",
+        "description": "May develop and manage tenant integrations."
+      },
+      {
+        "name": "Reader",
+        "description": "May read and query tenant resources."
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "proofpoint-api",
+      "name": "ProofPoint RAG API",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "bearerOnly": true,
+      "publicClient": false,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false
+    }
+  ]
+}

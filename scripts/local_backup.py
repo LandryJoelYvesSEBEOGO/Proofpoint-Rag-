@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import TypeGuard
 
 STATEFUL_VOLUMES = {
+    "keycloak": "/opt/keycloak/data",
     "postgres": "/var/lib/postgresql/data",
     "valkey": "/data",
     "seaweedfs": "/data",

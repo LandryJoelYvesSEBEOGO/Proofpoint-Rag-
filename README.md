@@ -177,7 +177,7 @@ Proofpoint-Rag-/
 
 The MVP roadmap spans 26 relative weeks across five phases, each with a concrete exit gate. For the detailed sprint tasks, requirement IDs, evidence, and current open decisions, see [docs/ROADMAP.md](./docs/ROADMAP.md).
 
-**Current position (2026-10-29): Phase 1, Sprint 1 — Infrastructure and accounts, in progress.** The Phase 0 J0 market gate was explicitly waived so work could proceed; its three pilot letters of intent and other discovery deliverables have not thereby been completed. The local stack and FastAPI skeleton are foundations, not completion of Sprint 1 or J1.
+**Current position (2026-10-29): Phase 1, Sprint 1 — Infrastructure and accounts, in progress.** The Phase 0 J0 market gate was explicitly waived so work could proceed; its three pilot letters of intent and other discovery deliverables have not thereby been completed. The local stack, FastAPI skeleton, and Keycloak development realm are foundations, not completion of Sprint 1 or J1. The Keycloak realm defines Admin, Developer, and Reader roles; API token enforcement and tenant organization provisioning are still pending.
 
 ## Quality targets
 

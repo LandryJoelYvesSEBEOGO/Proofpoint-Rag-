@@ -19,14 +19,14 @@ The project chose to proceed without the Phase 0 market gate. The J0 requirement
 
 | Sprint 1 item | Status | Evidence / remaining work |
 |---|---|---|
-| Local development services | Partial | Compose defines PostgreSQL, Valkey, SeaweedFS, and Qdrant with persistent volumes and healthchecks. An isolated validation stack started healthy; the regular project stack remains unverified. |
+| Local development services | Partial | Compose defines Keycloak, PostgreSQL, Valkey, SeaweedFS, and Qdrant with persistent volumes and healthchecks. An isolated stack with all five services was healthy; the regular project stack remains unverified. |
 | FastAPI and OpenAPI skeleton | Partial | Health, OpenAPI, tracing, typed errors, and a Compose API service/healthcheck are present. Scoped API-key authentication and rate limits are not implemented. The API container image has not yet been built. |
 | CI quality checks | Partial | Lint, formatting, typing, import contracts, and tests are configured in CI. There is no build-and-deploy pipeline for staging or production. |
 | Staging/production infrastructure | Decision needed | Terraform/Kubernetes target is deferred until the hosting provider and region are chosen. |
-| Backups and restore verification | Done for local development | On-demand archive and restore were exercised against isolated PostgreSQL, Valkey, SeaweedFS, and Qdrant volumes: test markers survived backup, mutation, and restore, and all four services returned healthy. Archives remain unencrypted and are not production backups. |
-| Keycloak organizations and roles | Not started | Admin / Developer / Reader role management is not implemented. |
+| Backups and restore verification | Done for local development | On-demand archive and restore were exercised against isolated Keycloak, PostgreSQL, Valkey, SeaweedFS, and Qdrant volumes: test markers survived backup, mutation, and restore; Keycloak retained its realm and roles; all five services returned healthy. Archives remain unencrypted and are not production backups. |
+| Keycloak local development realm | Partial | The development realm imported successfully; Admin / Developer / Reader roles were verified through the admin API. Organization/user provisioning and API token/role enforcement are not implemented. |
 
-Latest recorded code checks: 35 tests passed with 100% coverage; Ruff, mypy, import contracts, and Compose configuration validation passed. The isolated stateful-service stack and backup/restore path were verified. The API image build and regular project stack have **not** been verified.
+Latest recorded code checks: 37 tests passed with 100% coverage; Ruff, mypy, import contracts, and Compose configuration validation passed. The isolated five-service stack, Keycloak realm and role lookup, and backup/restore path were verified. The API image build and regular project stack have **not** been verified.
 
 The team is partially constituted. The pilot sector and country were intentionally passed over; they remain undecided rather than completed.
 
@@ -101,10 +101,12 @@ The project will use the user's proposed free or self-hosted options before cons
 
 **Sprint evidence:** repeatable local development; verified container build and health; staging/production deployment target documented; backup restore demonstrated; role and API-key permissions tested. Do not call the sprint complete based only on the current API skeleton.
 
+The local Keycloak service imports a development realm containing the three initial realm roles. It is not production-ready: the API does not validate Keycloak tokens, no users or tenant organizations are seeded, and the HTTP development server must not be exposed outside the local machine.
+
 #### Local on-demand backup procedure
 
 - Start the complete local stack and create an archive with `uv run python scripts/local_backup.py backup --env-file .env`.
-- The utility cleanly stops PostgreSQL, Valkey, SeaweedFS, and Qdrant, archives their named Docker volumes, then restarts the services. It writes a timestamped backup and manifest under `.backups/`, which is gitignored.
+- The utility cleanly stops Keycloak, PostgreSQL, Valkey, SeaweedFS, and Qdrant, archives their named Docker volumes, then restarts the services. It writes a timestamped backup and manifest under `.backups/`, which is gitignored.
 - Restore with `uv run python scripts/local_backup.py restore --env-file .env --manifest .backups/<timestamp>/manifest.json`. Restore checks the Compose project and volume names, then requires typing `RESTORE` before replacing volume contents. `--yes` is an explicit confirmation for non-interactive use.
 - Restore only into the same Compose project with compatible service versions. If a restore fails partway through, services remain stopped so partial data is not served.
 - These archives are unencrypted and intended only for local development data. Copy them to an external drive manually if needed; do not treat this as production backup protection.
