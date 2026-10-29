@@ -11,6 +11,7 @@ Vectara — Analyse & cahier des charges.docx
 # eval questions). Public synthetic fixtures belong in tests/fixtures/.
 /Raw/
 /data/
+/.backups/
 
 # Local tooling
 .qodo/

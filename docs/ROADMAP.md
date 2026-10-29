@@ -19,14 +19,14 @@ The project chose to proceed without the Phase 0 market gate. The J0 requirement
 
 | Sprint 1 item | Status | Evidence / remaining work |
 |---|---|---|
-| Local development services | Partial | Compose defines PostgreSQL, Valkey, SeaweedFS, and Qdrant with persistent volumes and healthchecks. The local stack has not been started in this environment. |
-| FastAPI and OpenAPI skeleton | Partial | Health, OpenAPI, tracing, typed errors, and a Compose API service/healthcheck are present. Scoped API-key authentication and rate limits are not implemented. The API container image has not been built because Docker Desktop was unavailable. |
+| Local development services | Partial | Compose defines PostgreSQL, Valkey, SeaweedFS, and Qdrant with persistent volumes and healthchecks. An isolated validation stack started healthy; the regular project stack remains unverified. |
+| FastAPI and OpenAPI skeleton | Partial | Health, OpenAPI, tracing, typed errors, and a Compose API service/healthcheck are present. Scoped API-key authentication and rate limits are not implemented. The API container image has not yet been built. |
 | CI quality checks | Partial | Lint, formatting, typing, import contracts, and tests are configured in CI. There is no build-and-deploy pipeline for staging or production. |
 | Staging/production infrastructure | Decision needed | Terraform/Kubernetes target is deferred until the hosting provider and region are chosen. |
-| Backups and restore verification | Not started | No verified backup/restore procedure is present. |
+| Backups and restore verification | Done for local development | On-demand archive and restore were exercised against isolated PostgreSQL, Valkey, SeaweedFS, and Qdrant volumes: test markers survived backup, mutation, and restore, and all four services returned healthy. Archives remain unencrypted and are not production backups. |
 | Keycloak organizations and roles | Not started | Admin / Developer / Reader role management is not implemented. |
 
-Latest recorded code checks: 29 tests passed with 100% coverage; Ruff, mypy, import contracts, and Compose configuration validation passed. The Docker image build and live stack health have **not** been verified.
+Latest recorded code checks: 35 tests passed with 100% coverage; Ruff, mypy, import contracts, and Compose configuration validation passed. The isolated stateful-service stack and backup/restore path were verified. The API image build and regular project stack have **not** been verified.
 
 The team is partially constituted. The pilot sector and country were intentionally passed over; they remain undecided rather than completed.
 
@@ -39,7 +39,7 @@ The project will use the user's proposed free or self-hosted options before cons
 | Development and staging | Keep the current Docker Compose stack on the development machine. Use `kind`, k3s, or minikube locally only when Kubernetes behavior needs testing. | Oracle Cloud Always Free for a temporary online test. | Oracle capacity can be unavailable in a region and account verification requires a bank card. It is not the default and must be approved before provisioning. No production SLA is assumed. |
 | Embeddings and reranking | Start on CPU locally; test TEI CPU or an ONNX/quantized option before deciding hardware needs. | Colab or Kaggle for offline batch experiments; Hugging Face's free API for small tests. | Free GPU quotas are limited and sessions can stop; notebooks are not stable inference services. Use only public or synthetic test data unless external processing of private documents is explicitly approved. |
 | PostgreSQL, queue/cache, object store, vector search | Keep PostgreSQL, Valkey, SeaweedFS, and Qdrant in the existing Compose stack. | For isolated online experiments: Neon or Supabase (PostgreSQL), Upstash (Redis-compatible cache), Cloudflare R2 (object storage), and Qdrant Cloud free tier. | Quotas are limited; hosted databases may pause after inactivity. Qdrant Cloud's proposed 1 GB and R2's proposed 10 GB are planning figures from the user's suggestion, not guarantees—check current terms. Do not mix providers or move tenant data until the architecture, region, credentials, and isolation tests are reviewed. |
-| Backups | Use logical exports/snapshots to a local external drive while the local stack is the target. Write and test restore steps. | `pg_dump`, Qdrant snapshots, and `restic`/`rclone` to R2 or Backblaze B2. | Remote storage may have limits or charges beyond its free allowance. Encrypt backups and never send customer data to a third party without approval. A backup is not complete until restoration has been demonstrated. |
+| Backups | Create on-demand offline archives of the local Compose data volumes; keep copies on a local external drive. | `pg_dump`, Qdrant snapshots, and `restic`/`rclone` to R2 or Backblaze B2. | The volume archive briefly stops stateful services and requires compatible Compose service versions to restore. Local archives are not encrypted; use only for development data until encryption is added. Remote storage may have limits or charges. A backup is not complete until restoration has been demonstrated. |
 | CI/CD | Keep the existing GitHub Actions checks. Use `act` for local workflow iteration when useful. | GitHub Actions on the free allowance, or GitLab CI. | Private-repository minutes and artifact storage may be limited; monitor consumption. Avoid unnecessary large image builds. |
 | Identity and processing tools | Prefer the existing self-hosted/open-source choices: Keycloak, Docling/OCR, and Celery. | Authentik or Supabase Auth for a development-only experiment if Keycloak is too costly to operate locally. | These still consume compute and memory. Do not replace the target identity design or use hosted auth for real tenants without an explicit decision and security review. |
 | Engineering capacity | Keep the team-size/capacity gap visible; the planned six human roles cannot be replaced by free software. | Free AI coding assistants and community contributors can help with bounded tasks. | Tools do not replace accountable engineering, review, operations, or security ownership. Do not send private source documents, secrets, or customer data to an assistant. |
@@ -100,6 +100,14 @@ The project will use the user's proposed free or self-hosted options before cons
 - Complete the FastAPI/OpenAPI foundation, scoped API keys, and per-key rate limits.
 
 **Sprint evidence:** repeatable local development; verified container build and health; staging/production deployment target documented; backup restore demonstrated; role and API-key permissions tested. Do not call the sprint complete based only on the current API skeleton.
+
+#### Local on-demand backup procedure
+
+- Start the complete local stack and create an archive with `uv run python scripts/local_backup.py backup --env-file .env`.
+- The utility cleanly stops PostgreSQL, Valkey, SeaweedFS, and Qdrant, archives their named Docker volumes, then restarts the services. It writes a timestamped backup and manifest under `.backups/`, which is gitignored.
+- Restore with `uv run python scripts/local_backup.py restore --env-file .env --manifest .backups/<timestamp>/manifest.json`. Restore checks the Compose project and volume names, then requires typing `RESTORE` before replacing volume contents. `--yes` is an explicit confirmation for non-interactive use.
+- Restore only into the same Compose project with compatible service versions. If a restore fails partway through, services remain stopped so partial data is not served.
+- These archives are unencrypted and intended only for local development data. Copy them to an external drive manually if needed; do not treat this as production backup protection.
 
 ### Sprint 2 — Ingestion (weeks 5–6)
 

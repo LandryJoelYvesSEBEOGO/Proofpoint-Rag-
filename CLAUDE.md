@@ -50,6 +50,7 @@ generation/  LLM gateway, prompts, citations, hallucination score (package only)
 connectors/  Web crawler, Google Drive, SharePoint (package only)
 eval/        Evaluation suite (recall@10, hallucination rate) (package only)
 tests/       Test suite (pytest)
+scripts/     Local development utilities, including on-demand volume backup/restore
 console/     Next.js admin console and playground (target)
 widget/     Chat and search Web Component (target)
 deploy/      docker-compose.yml: local stack (PostgreSQL, Valkey, SeaweedFS S3, Qdrant); Helm, Terraform (target)
@@ -76,6 +77,8 @@ Local stack (Docker Compose v2, run from the repository root; `--env-file` is re
 - Status: `docker compose --env-file .env -f deploy/docker-compose.yml ps`
 - Stop (keep data): `docker compose --env-file .env -f deploy/docker-compose.yml down`
 - Stop and delete all local data: `docker compose --env-file .env -f deploy/docker-compose.yml down --volumes`
+- Create a local on-demand backup: `uv run python scripts/local_backup.py backup --env-file .env` (briefly stops the stateful services; archives are unencrypted and local-only)
+- Restore a backup (requires explicit confirmation before replacing data): `uv run python scripts/local_backup.py restore --env-file .env --manifest .backups/<timestamp>/manifest.json`
 - Services, all bound to 127.0.0.1: API :8000, PostgreSQL :5432, Valkey :6379, S3 endpoint :8333, Qdrant :6333
 
 API (run from the repository root):
