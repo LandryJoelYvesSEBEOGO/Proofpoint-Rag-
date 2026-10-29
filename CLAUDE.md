@@ -7,7 +7,9 @@ Status: MVP in progress. Apache-2.0. Not affiliated with Vectara or Proofpoint, 
 
 ## Current state (read first)
 
-- The repo currently contains the README and the target architecture. Many folders and commands below are the MVP TARGET, not yet implemented.
+- The repo contains a Python project, local Docker Compose stack, CI checks, and a minimal FastAPI application with health, OpenAPI, tracing, and typed errors. Ingestion, indexing, search, authentication, and most target services are not implemented yet.
+- Current roadmap position (2026-10-29): Phase 1, Sprint 1 is in progress. The project explicitly waived the Phase 0 J0 market gate; this does not mean its pilot letters of intent or other discovery deliverables were obtained.
+- Budget preference: use local/self-hosted and free-tier options first, as detailed in `docs/ROADMAP.md`. Do not provision cloud resources, subscribe, enter payment details, or incur charges without explicit approval; free hosted services do not receive private customer data without approval.
 - Before assuming a file, command or service exists, check the repo. If it does not exist, say so and propose creating it. Never invent paths or commands.
 - When you create a new module, update the "Repository structure" and "Commands" sections of this file in the same change.
 
@@ -34,8 +36,11 @@ Folders marked `(target)` do not exist yet.
 ```
 pyproject.toml  Single Python project (uv): dependencies, ruff, mypy, pytest, coverage, import-linter
 uv.lock         Locked dependency versions (always committed)
+Dockerfile      Container image for the FastAPI application; .dockerignore excludes private data
 .github/        CI workflow (lint, format, type check, import contracts, tests, local stack health)
 .env.example    Every environment variable, documented, with development-only values
+docs/           Product specifications, architecture decisions, and guides
+  ROADMAP.md    Detailed MVP roadmap, phase gates, current status, and requirement map
 api/         FastAPI app: app.py (factory), main.py (uvicorn entry point), settings.py (env config),
              errors.py (typed errors), tracing.py (OpenTelemetry, trace id), middleware.py
              (x-trace-id header, request log), log_config.py (JSON logs), health.py, v1/ (/v1 routes)
@@ -46,9 +51,8 @@ connectors/  Web crawler, Google Drive, SharePoint (package only)
 eval/        Evaluation suite (recall@10, hallucination rate) (package only)
 tests/       Test suite (pytest)
 console/     Next.js admin console and playground (target)
-widget/      Chat and search Web Component (target)
+widget/     Chat and search Web Component (target)
 deploy/      docker-compose.yml: local stack (PostgreSQL, Valkey, SeaweedFS S3, Qdrant); Helm, Terraform (target)
-docs/        Specs, architecture decisions, guides (target)
 ```
 
 ## Commands
@@ -72,13 +76,15 @@ Local stack (Docker Compose v2, run from the repository root; `--env-file` is re
 - Status: `docker compose --env-file .env -f deploy/docker-compose.yml ps`
 - Stop (keep data): `docker compose --env-file .env -f deploy/docker-compose.yml down`
 - Stop and delete all local data: `docker compose --env-file .env -f deploy/docker-compose.yml down --volumes`
-- Services, all bound to 127.0.0.1: PostgreSQL :5432, Valkey :6379, S3 endpoint :8333, Qdrant :6333
+- Services, all bound to 127.0.0.1: API :8000, PostgreSQL :5432, Valkey :6379, S3 endpoint :8333, Qdrant :6333
 
 API (run from the repository root):
 
 - Start with auto-reload: `uv run --env-file .env uvicorn api.main:app --reload --no-access-log` (`--no-access-log`: the app writes its own JSON request log, without query strings)
 - Health: http://localhost:8000/health; API docs: http://localhost:8000/docs
 - Every response carries an `x-trace-id` header; error bodies have the shape `{"error": {"code", "message", "details"}, "trace_id"}` (see `api/errors.py`). Raise `api.errors.ApiError` for deliberate client errors.
+
+Roadmap: see `docs/ROADMAP.md` for phase goals, sprint tasks, acceptance gates, and verified project status.
 
 Target endpoints (not implemented yet):
 - Console: http://localhost:3000
